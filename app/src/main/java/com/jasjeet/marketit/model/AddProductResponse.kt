@@ -1,8 +1,8 @@
 package com.jasjeet.marketit.model
 
 data class AddProductResponse(
-    val message: String,
-    val product_details: ListingDataItem,
-    val product_id: Int,
-    val success: Boolean
+    val message: String? = null,
+    val product_details: ListingDataItem? = null,
+    val product_id: Int? = null,
+    val success: Boolean? = null
 )

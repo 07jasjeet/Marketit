@@ -1,6 +1,5 @@
 package com.jasjeet.marketit.model
 
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jasjeet.marketit.util.Resource
@@ -20,15 +19,17 @@ interface ResponseError {
     
     companion object {
         
+        /** Helper function for easily logging and returning errors.*/
         fun <T> logAndReturn(error: Throwable): Resource<T> {
-            Log.e("Marketit", error.localizedMessage ?: "Error" )
+            error.printStackTrace()
             return if (error is IOException)
                 Resource.failure(error = GeneralError.NETWORK_ERROR)
             else
                 Resource.failure(error = GeneralError.UNKNOWN)
         }
         
-        /** Get [ResponseError] for a given Retrofit **error** [Response] from server.*/
+        
+        /** Get [ResponseError] for a given Retrofit **error** [Response] from server of type [GeneralError].*/
         fun <T> getGeneralResponseError(response: Response<T>) : ResponseError {
             val error = parseError(response)
             return getGeneralErrorType(error)

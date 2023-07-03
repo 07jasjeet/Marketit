@@ -2,6 +2,13 @@ package com.jasjeet.marketit.dependencies
 
 import org.koin.dsl.module
 
+/** Main Module of the app.*/
 val appModule = module {
-    single {  }
+    
+    includes(
+        dispatcherModule,
+        networkModule,
+        viewModelModule
+    )
+    
 }

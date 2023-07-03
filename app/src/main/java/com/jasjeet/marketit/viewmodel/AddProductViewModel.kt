@@ -53,4 +53,9 @@ class AddProductViewModel(
         }
     }
     
+    fun clearError() =
+        viewModelScope.launch {
+            errorFlow.emit(null)
+        }
+    
 }

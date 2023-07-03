@@ -3,7 +3,7 @@ package com.jasjeet.marketit.ui.addproduct
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import androidx.fragment.app.viewModels
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.jasjeet.marketit.viewmodel.AddProductViewModel
 import com.jasjeet.marketit.R
@@ -29,7 +29,19 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
             btnAdd.setOnClickListener {
                 viewModel.addProduct(price = "10", name = "Bux", type = "Soap", tax = "13")
                 mainViewModel.alertProductAdded(ListingDataItem(price = 10.0, product_name = "Lux", product_type = "Soap", tax = 13.0))
-                findNavController().popBackStack()
+            }
+            
+            // Observing Ui State
+            observeUiState()
+            
+        }
+    }
+    
+    private fun observeUiState() {
+        viewModel.uiState.observe(viewLifecycleOwner) {
+            if (it.error != null){
+                Toast.makeText(activity, getString(R.string.error_add_product) + " " + it.error.toast(), Toast.LENGTH_LONG).show()
+                viewModel.clearError()
             }
         }
     }

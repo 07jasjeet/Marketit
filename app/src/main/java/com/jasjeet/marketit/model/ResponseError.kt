@@ -48,6 +48,7 @@ interface ResponseError {
         private fun getGeneralErrorType(apiError: ApiError) : ResponseError {
             val error = apiError.message
             
+            // TODO: Add responses based on what server usually communicates.
             return when {
                 else -> GeneralError.UNKNOWN
             }.apply { actualResponse = error }

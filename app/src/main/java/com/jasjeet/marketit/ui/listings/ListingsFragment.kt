@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
-import androidx.navigation.fragment.NavHostFragment
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.jasjeet.marketit.R
 import com.jasjeet.marketit.databinding.FragmentListingsListBinding
@@ -36,6 +36,7 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
         val listingsAdapter = ListingsAdapter()
         
         binding.apply {
+            // Configuring Recycler View
             list.apply {
                 adapter = listingsAdapter
                 layoutManager = when {
@@ -44,21 +45,34 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
                 }
             }
             
-            viewModel.uiState.observe(viewLifecycleOwner) {
-                listingsAdapter.updateList(it.listings)
-            }
+            // Observing Ui state
+            observeUiState(listingsAdapter)
             
+            // Add Product button
             fab.setOnClickListener {
-                findNavController().navigate(R.id.action_listingsFragment_to_addProductFragment)
+                navigateForward()
             }
             
         }
     }
     
-    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    
+    private fun observeUiState(listingsAdapter: ListingsAdapter) {
+        viewModel.uiState.observe(viewLifecycleOwner) {
+            listingsAdapter.updateList(it.listings)
+            if (it.error != null){
+                Toast.makeText(context, getString(R.string.error_listings) + " " + it.error.toast(), Toast.LENGTH_LONG).show()
+                viewModel.clearError()
+            }
+        }
+    }
+    
+    private fun navigateForward(){
+        findNavController().navigate(R.id.action_listingsFragment_to_addProductFragment)
     }
     
     companion object {

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Market it</string>
     <string name="addProduct">Add Product</string>
+    <string name="searchbar_hint">Search</string>
+    <string name="error_listings">Could not fetch listings.</string>
+    <string name="error_add_product">Failed to add product to listings.</string>
 </resources>

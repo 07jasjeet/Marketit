@@ -57,6 +57,11 @@ class MainViewModel(
             }
         }
     
+    fun clearError() =
+        viewModelScope.launch {
+            errorFlow.emit(null)
+        }
+    
     fun alertProductAdded(newItem: ListingDataItem) {
         viewModelScope.launch(defaultDispatcher) {
             val list = listingsFlow.value

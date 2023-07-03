@@ -4,23 +4,21 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
-import androidx.navigation.fragment.findNavController
 
 import com.jasjeet.marketit.placeholder.PlaceholderContent.PlaceholderItem
 import com.jasjeet.marketit.databinding.FragmentListingsBinding
+import com.jasjeet.marketit.model.ListingData
 
 /**
  * [RecyclerView.Adapter] that can display a [PlaceholderItem].
  * TODO: Replace the implementation with code for your data type.
  */
-class MyListingsRecyclerViewAdapter(
-    private val values: List<PlaceholderItem>,
-    private val onClick: () -> Unit
-) : RecyclerView.Adapter<MyListingsRecyclerViewAdapter.ViewHolder>() {
+class ListingsAdapter
+    : RecyclerView.Adapter<ListingsAdapter.ViewHolder>() {
+    
+    private var list: ListingData? = null
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        
         return ViewHolder(
             FragmentListingsBinding.inflate(
                 LayoutInflater.from(parent.context),
@@ -28,19 +26,17 @@ class MyListingsRecyclerViewAdapter(
                 false
             )
         )
-        
     }
     
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.idView.text = item.id
-        holder.contentView.text = item.content
-        holder.contentView.setOnClickListener {
-            onClick()
-        }
+        val item = list?.get(position)
+        
+        holder.idView.text = position.toString()
+        holder.contentView.text = item?.product_name
+        
     }
     
-    override fun getItemCount(): Int = values.size
+    override fun getItemCount(): Int = list?.size ?: 0
     
     inner class ViewHolder(binding: FragmentListingsBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -50,6 +46,11 @@ class MyListingsRecyclerViewAdapter(
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
         }
+    }
+    
+    fun updateList(list: ListingData?) {
+        this.list = list
+        this.notifyDataSetChanged()
     }
     
 }

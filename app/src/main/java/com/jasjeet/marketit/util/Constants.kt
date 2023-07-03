@@ -1,5 +1,5 @@
 package com.jasjeet.marketit.util
 
 object Constants {
-    const val URL = "https://app.getswipe.in/"
+    const val BASE_URL = "https://app.getswipe.in/api/public/"
 }

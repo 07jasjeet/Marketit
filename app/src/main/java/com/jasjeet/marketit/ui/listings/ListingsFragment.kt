@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.jasjeet.marketit.R
 import com.jasjeet.marketit.databinding.FragmentListingsListBinding
 import com.jasjeet.marketit.viewmodel.MainViewModel
@@ -46,6 +48,10 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
                 listingsAdapter.updateList(it.listings)
             }
             
+            fab.setOnClickListener {
+                findNavController().navigate(R.id.action_listingsFragment_to_addProductFragment)
+            }
+            
         }
     }
     
@@ -56,17 +62,6 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
     }
     
     companion object {
-        
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
-        
-        // TODO: Customize parameter initialization
-        @JvmStatic
-        fun newInstance(columnCount: Int) =
-            ListingsFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
-                }
-            }
     }
 }

@@ -14,7 +14,7 @@ interface AppRepository {
         type: String,
         price:String,
         tax: String,
-        images: List<File> = emptyList()
+        image: File
     ): Resource<AddProductResponse>
     
 }

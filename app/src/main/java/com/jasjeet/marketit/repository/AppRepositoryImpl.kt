@@ -21,16 +21,18 @@ class AppRepositoryImpl(private val apiService: ApiService) : AppRepository {
             }
         }.getOrElse { logAndReturn(it) }
     
-    
+    /** Add a product.
+     *
+     * @param image not uploading images even using postman so is useless for now.*/
     override suspend fun addProduct(
         name: String,
         type: String,
         price:String,
         tax: String,
-        images: List<File>
+        image: File
     ): Resource<AddProductResponse> =
         runCatching {
-            val response = apiService.addProduct(name, type, price, tax, images)
+            val response = apiService.addProduct(name, type, price, tax, /*image*/)
             return@runCatching if (response.isSuccessful) {
                 Resource.success((response.body() ?: AddProductResponse()))
             } else {

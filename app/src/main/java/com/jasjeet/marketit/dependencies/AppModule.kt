@@ -6,7 +6,6 @@ import org.koin.dsl.module
 val appModule = module {
     
     includes(
-        dispatcherModule,
         networkModule,
         viewModelModule
     )

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.jasjeet.marketit.model.ListingData
+import com.jasjeet.marketit.model.ListingDataItem
 import com.jasjeet.marketit.model.ListingsUiState
 import com.jasjeet.marketit.model.ResponseError
 import com.jasjeet.marketit.repository.AppRepository
@@ -19,7 +20,8 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val repository: AppRepository,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     
     private val errorFlow = MutableStateFlow<ResponseError?>(null)
@@ -28,9 +30,8 @@ class MainViewModel(
     val uiState = createUiStateFlow().asLiveData()
     
     init {
-        viewModelScope.launch {
-            fetchListings()
-        }
+        // Fetching data for the first time automatically.
+        fetchListings()
     }
     
     private fun createUiStateFlow(): StateFlow<ListingsUiState> {
@@ -42,19 +43,26 @@ class MainViewModel(
         }.stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            ListingsUiState(null, null)
+            ListingsUiState()
         )
     }
     
-    suspend fun fetchListings() = withContext(ioDispatcher){
-        val result = repository.getData()
-        when (result.status){
-            Resource.Status.FAILED -> errorFlow.emit(result.error)
-            Resource.Status.SUCCESS -> listingsFlow.emit(result.data)
-            else -> Unit
+    fun fetchListings() =
+        viewModelScope.launch(ioDispatcher) {
+            val result = repository.getData()
+            when (result.status) {
+                Resource.Status.FAILED -> errorFlow.emit(result.error)
+                Resource.Status.SUCCESS -> listingsFlow.emit(result.data)
+                else -> Unit
+            }
+        }
+    
+    fun alertProductAdded(newItem: ListingDataItem) {
+        viewModelScope.launch(defaultDispatcher) {
+            val list = listingsFlow.value
+            list?.add(newItem)
+            listingsFlow.emit(list)
         }
     }
-    
-    
     
 }

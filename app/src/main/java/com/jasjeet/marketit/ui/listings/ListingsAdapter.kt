@@ -1,5 +1,6 @@
 package com.jasjeet.marketit.ui.listings
 
+import android.annotation.SuppressLint
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.TextView
 import com.jasjeet.marketit.placeholder.PlaceholderContent.PlaceholderItem
 import com.jasjeet.marketit.databinding.FragmentListingsBinding
 import com.jasjeet.marketit.model.ListingData
+import com.jasjeet.marketit.model.ListingDataItem
 
 /**
  * [RecyclerView.Adapter] that can display a [PlaceholderItem].
@@ -48,9 +50,15 @@ class ListingsAdapter
         }
     }
     
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(list: ListingData?) {
         this.list = list
         this.notifyDataSetChanged()
+    }
+    
+    fun addItem(newItem: ListingDataItem) {
+        list?.add(0, newItem)
+        notifyItemInserted(0)
     }
     
 }

@@ -22,7 +22,7 @@ interface ApiService {
         @Field("product_type") type: String,
         @Field("price") price: String,
         @Field("tax") tax: String,
-        @Field("file[]") images: List<File>,
+        //@Field("file[]") images: File,
     ): Response<AddProductResponse>
     
 }

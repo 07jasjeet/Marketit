@@ -1,6 +1,6 @@
 package com.jasjeet.marketit.model
 
-data class ListingsUiState(
-    val listings: ListingData? = null,
+data class AddProductUiState(
+    val result: AddProductResponse? = null,
     val error: ResponseError? = null
 )

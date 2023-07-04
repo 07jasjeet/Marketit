@@ -48,6 +48,11 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
                 navigateForward()
             }
             
+            swipeRefresh.apply {
+                setOnRefreshListener {
+                    viewModel.fetchListings()
+                }
+            }
         }
     }
     
@@ -58,21 +63,20 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
     
     private fun observeUiState(listingsAdapter: ListingsAdapter) {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            binding.progressIndicator.visibility =
+            binding.errorText.visibility =
                 when (uiState.status) {
                     Resource.Status.LOADING -> {
                         // Loading
-                        removeErrorText()
-                        VISIBLE
+                        binding.swipeRefresh.isRefreshing = true
+                        GONE
                     }
                     Resource.Status.FAILED -> {
                         // Error occurred while loading data.
-                        setErrorTextVisible()
-                        GONE
+                        binding.swipeRefresh.isRefreshing = false
+                        VISIBLE
                     }
                     Resource.Status.SUCCESS -> {
                         // Success
-                        removeErrorText()
                         if (uiState.listings != null){
                             // If the user adds a product him/herself, we need not to make an API call.
                             // We can directly inject the newer item. Usually we can use item ID for
@@ -82,6 +86,7 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
                             else
                                 listingsAdapter.updateList(uiState.listings)
                         }
+                        binding.swipeRefresh.isRefreshing = false
                         GONE
                     }
                 }
@@ -100,16 +105,6 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
     
     private fun navigateForward(){
         findNavController().navigate(R.id.action_listingsFragment_to_addProductFragment)
-    }
-    
-    private fun setErrorTextVisible() {
-        if (!binding.errorText.isVisible)
-            binding.errorText.visibility = VISIBLE
-    }
-    
-    private fun removeErrorText() {
-        if (binding.errorText.isVisible)
-            binding.errorText.visibility = GONE
     }
     
 }

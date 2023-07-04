@@ -8,8 +8,6 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.jasjeet.marketit.R
-
-import com.jasjeet.marketit.placeholder.PlaceholderContent.PlaceholderItem
 import com.jasjeet.marketit.databinding.FragmentListingsBinding
 import com.jasjeet.marketit.model.ListingData
 import com.jasjeet.marketit.model.ListingDataItem

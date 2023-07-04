@@ -40,29 +40,32 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
         // Observing Ui state
         observeUiState(listingsAdapter)
         
+        // Configuring search Recycler View
+        setSearchRecyclerView(searchAdapter)
         
         // Add Product button
-        binding.apply {
-            fab.setOnClickListener {
-                navigateForward()
-            }
-            
-            searchBarLayout.apply {
-                
-                rvSearchResult.apply {
-                    adapter = searchAdapter
-                    layoutManager = LinearLayoutManager(context)
-                }
-                
-                searchView.editText.addTextChangedListener { query ->
-                    viewModel.searchForItem(query.toString()){ result ->
-                        searchAdapter.updateList(result)
-                    }
-                }
-                
-            }
+        binding.fab.setOnClickListener {
+            navigateForward()
         }
         
+        
+    }
+    
+    private fun setSearchRecyclerView(searchAdapter: SearchAdapter) {
+        binding.searchBarLayout.apply {
+        
+            rvSearchResult.apply {
+                adapter = searchAdapter
+                layoutManager = LinearLayoutManager(context)
+            }
+        
+            searchView.editText.addTextChangedListener { query ->
+                viewModel.searchForItem(query = query.toString()) { result ->
+                    searchAdapter.updateList(result)
+                }
+            }
+        
+        }
     }
     
     override fun onDestroyView() {

@@ -8,11 +8,13 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.jasjeet.marketit.R
 import com.jasjeet.marketit.databinding.FragmentListingsListBinding
+import com.jasjeet.marketit.model.ListingData
 import com.jasjeet.marketit.util.Resource
 import com.jasjeet.marketit.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -71,7 +73,15 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
                     Resource.Status.SUCCESS -> {
                         // Success
                         removeErrorText()
-                        listingsAdapter.updateList(uiState.listings)
+                        if (uiState.listings != null){
+                            // If the user adds a product him/herself, we need not to make an API call.
+                            // We can directly inject the newer item. Usually we can use item ID for
+                            // comparison purpose but here, due to restrictions, are going to use list item itself.
+                            if (uiState.listings[1] == listingsAdapter.getFirstItem())
+                                listingsAdapter.addItem(uiState.listings[0])
+                            else
+                                listingsAdapter.updateList(uiState.listings)
+                        }
                         GONE
                     }
                 }

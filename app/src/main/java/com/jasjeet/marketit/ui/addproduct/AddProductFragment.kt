@@ -32,7 +32,9 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         _binding = FragmentAddProductBinding.bind(view)
         
         binding.apply {
+            
             btnAdd.setOnClickListener {
+                
                 val name = productName.text
                 val type = productType.text
                 val price = productPrice.text
@@ -57,13 +59,13 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                     return@setOnClickListener
                 }
                 
-                
                 viewModel.addProduct(
                     name = name.toString(),
                     type = type.toString(),
                     price = price.toString(),
                     tax = tax.toString()
                 )
+                
                 mainViewModel.alertProductAdded(
                     ListingDataItem(
                         product_name = name.toString(),
@@ -72,6 +74,8 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                         tax = taxDouble
                     )
                 )
+                
+                findNavController().popBackStack()
             }
             
             // Observing Ui State
@@ -99,7 +103,7 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
             withContext(Dispatchers.Main){
                 binding.errorText.text = getString(id)
             }
-            
+            // Delay for erasing the error.
             delay(3000)
             
             withContext(Dispatchers.Main) { binding.errorText.text = null }

@@ -5,11 +5,15 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.google.android.material.imageview.ShapeableImageView
+import com.jasjeet.marketit.R
 
 import com.jasjeet.marketit.placeholder.PlaceholderContent.PlaceholderItem
 import com.jasjeet.marketit.databinding.FragmentListingsBinding
 import com.jasjeet.marketit.model.ListingData
 import com.jasjeet.marketit.model.ListingDataItem
+import java.text.DecimalFormat
 
 /**
  * [RecyclerView.Adapter] that can display a [PlaceholderItem].
@@ -32,22 +36,25 @@ class ListingsAdapter
     
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list?.get(position)
-        
-        holder.idView.text = position.toString()
-        holder.contentView.text = item?.product_name
-        
+        Glide.with(holder.imageView.context)
+            .load(item?.image)
+            .placeholder(R.drawable.placeholder)
+            .into(holder.imageView)
+        holder.name.text = item?.product_name
+        holder.type.text = item?.product_type
+        holder.price.text = DecimalFormat("#.#").format(item?.price).toString()
+        holder.tax.text = DecimalFormat("#.#").format(item?.tax).toString()
     }
     
     override fun getItemCount(): Int = list?.size ?: 0
     
     inner class ViewHolder(binding: FragmentListingsBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        val idView: TextView = binding.itemNumber
-        val contentView: TextView = binding.content
-        
-        override fun toString(): String {
-            return super.toString() + " '" + contentView.text + "'"
-        }
+        val name: TextView = binding.tvName
+        val type: TextView = binding.tvType
+        val price: TextView = binding.tvPrice
+        val tax: TextView = binding.tvTax
+        val imageView: ShapeableImageView = binding.image
     }
     
     @SuppressLint("NotifyDataSetChanged")
@@ -61,4 +68,7 @@ class ListingsAdapter
         notifyItemInserted(0)
     }
     
+    fun getFirstItem(): ListingDataItem? {
+        return list?.get(0)
+    }
 }

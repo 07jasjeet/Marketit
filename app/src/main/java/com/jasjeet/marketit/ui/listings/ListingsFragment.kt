@@ -17,11 +17,12 @@ import com.jasjeet.marketit.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
     
-    private val viewModel by activityViewModel<MainViewModel>()
+    private val viewModel by viewModel<MainViewModel>()
     
     private var _binding: FragmentListingsListBinding? = null
     private val binding get() = _binding!!

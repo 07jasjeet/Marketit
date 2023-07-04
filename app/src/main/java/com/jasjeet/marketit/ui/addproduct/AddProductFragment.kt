@@ -25,7 +25,6 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
     private val binding get() = _binding!!
     
     private val viewModel by viewModel<AddProductViewModel>()
-    private val mainViewModel by activityViewModel<MainViewModel>()
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

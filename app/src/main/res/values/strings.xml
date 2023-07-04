@@ -11,4 +11,6 @@
     <string name="product_tax">Tax</string>
     <string name="error_fields_empty">All fields are mandatory.</string>
     <string name="error_fields_invalid">Fields Price or Tax are invalid.</string>
+    <string name="add_to_cart">Add to cart</string>
+    <string name="success_add_product">Successfully added the product.</string>
 </resources>

@@ -4,7 +4,6 @@ import com.jasjeet.marketit.viewmodel.AddProductViewModel
 import com.jasjeet.marketit.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val viewModelModule = module {
@@ -13,14 +12,16 @@ val viewModelModule = module {
         MainViewModel(
             repository = get(),
             Dispatchers.IO,
-            Dispatchers.Default
+            Dispatchers.Default,
+            Dispatchers.Main
         )
     }
     
     viewModel {
         AddProductViewModel(
             repository = get(),
-            Dispatchers.IO
+            Dispatchers.IO,
+            Dispatchers.Default
         )
     }
 }

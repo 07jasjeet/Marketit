@@ -1,16 +1,16 @@
 package com.jasjeet.marketit.ui.addproduct
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.jasjeet.marketit.viewmodel.AddProductViewModel
 import com.jasjeet.marketit.R
 import com.jasjeet.marketit.databinding.FragmentAddProductBinding
-import com.jasjeet.marketit.model.ListingDataItem
+import com.jasjeet.marketit.util.Resource
+import com.jasjeet.marketit.viewmodel.AddProductViewModel
 import com.jasjeet.marketit.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -32,6 +32,13 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         _binding = FragmentAddProductBinding.bind(view)
         
         binding.apply {
+    
+            // Observing Ui State
+            observeUiState()
+            
+            btnBack.setOnClickListener {
+                findNavController().popBackStack()
+            }
             
             btnAdd.setOnClickListener {
                 
@@ -51,14 +58,6 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                     return@setOnClickListener
                 }
                 
-                // Checking if price and do not have letters in them.
-                val (priceDouble, taxDouble) = try {
-                    Pair(price.toString().toDouble(), tax.toString().toDouble())
-                } catch (e: NumberFormatException){
-                    setErrorText(R.string.error_fields_invalid)
-                    return@setOnClickListener
-                }
-                
                 viewModel.addProduct(
                     name = name.toString(),
                     type = type.toString(),
@@ -66,20 +65,7 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                     tax = tax.toString()
                 )
                 
-                mainViewModel.alertProductAdded(
-                    ListingDataItem(
-                        product_name = name.toString(),
-                        product_type = type.toString(),
-                        price = priceDouble,
-                        tax = taxDouble
-                    )
-                )
-                
-                findNavController().popBackStack()
             }
-            
-            // Observing Ui State
-            observeUiState()
             
         }
     }
@@ -90,9 +76,15 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
     }
     
     private fun observeUiState() {
-        viewModel.uiState.observe(viewLifecycleOwner) {
-            if (it.error != null){
-                Toast.makeText(activity, getString(R.string.error_add_product) + " " + it.error.toast(), Toast.LENGTH_LONG).show()
+        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+            
+            if (uiState.status == Resource.Status.SUCCESS){
+                Toast.makeText(activity, getString(R.string.success_add_product), Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
+            
+            if (uiState.error != null){
+                Toast.makeText(activity, getString(R.string.error_add_product) + " " + uiState.error.toast(), Toast.LENGTH_LONG).show()
                 viewModel.clearError()
             }
         }

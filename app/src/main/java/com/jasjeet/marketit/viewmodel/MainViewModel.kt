@@ -4,25 +4,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.jasjeet.marketit.model.ListingData
-import com.jasjeet.marketit.model.ListingDataItem
 import com.jasjeet.marketit.model.ListingsUiState
 import com.jasjeet.marketit.model.ResponseError
 import com.jasjeet.marketit.repository.AppRepository
 import com.jasjeet.marketit.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val repository: AppRepository,
     private val ioDispatcher: CoroutineDispatcher,
-    private val defaultDispatcher: CoroutineDispatcher
+    private val defaultDispatcher: CoroutineDispatcher,
+    private val mainDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     
     private val errorFlow = MutableStateFlow<ResponseError?>(null)
@@ -53,19 +53,22 @@ class MainViewModel(
     fun fetchListings() =
         viewModelScope.launch(ioDispatcher) {
             // Emitting loading status
-            statusFlow.emit(Resource.Status.LOADING)
+            withContext(defaultDispatcher){ statusFlow.emit(Resource.Status.LOADING) }
             
             val result = repository.getData()
-            when (result.status) {
-                Resource.Status.FAILED -> {
-                    statusFlow.emit(Resource.Status.FAILED)
-                    errorFlow.emit(result.error)
+            
+            withContext(defaultDispatcher){
+                when (result.status) {
+                    Resource.Status.FAILED -> {
+                        statusFlow.emit(Resource.Status.FAILED)
+                        errorFlow.emit(result.error)
+                    }
+                    Resource.Status.SUCCESS -> {
+                        statusFlow.emit(Resource.Status.SUCCESS)
+                        listingsFlow.emit(result.data)
+                    }
+                    else -> Unit
                 }
-                Resource.Status.SUCCESS -> {
-                    statusFlow.emit(Resource.Status.SUCCESS)
-                    listingsFlow.emit(result.data)
-                }
-                else -> Unit
             }
         }
     
@@ -75,11 +78,25 @@ class MainViewModel(
             errorFlow.emit(null)
         }
     
-    fun alertProductAdded(newItem: ListingDataItem) {
+    fun searchForItem(query: String, onSearchComplete: (ListingData) -> Unit) {
         viewModelScope.launch(defaultDispatcher) {
-            val list = listingsFlow.value
-            list?.add(newItem)
-            listingsFlow.emit(list)
+    
+            if (query.isEmpty()){ onSearchComplete(ListingData()) }
+            
+            val searchArea = uiState.value?.listings ?: return@launch
+            val result = ListingData()
+            
+            // Simple substring search.
+            searchArea.forEach { item ->
+                if (item.product_name.contains(query))
+                    result.add(item)
+            }
+    
+            // Notifying the recycler view.
+            withContext(mainDispatcher){
+                onSearchComplete(result)
+            }
+            
         }
     }
     

@@ -98,7 +98,10 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
                         Resource.Status.FAILED -> {
                             // Error occurred while loading data.
                             searchBarLayout.listingsList.swipeRefresh.isRefreshing = false
-                            VISIBLE
+                            if (uiState.listings.isNullOrEmpty())
+                                VISIBLE
+                            else
+                                GONE
                         }
             
                         Resource.Status.SUCCESS -> {

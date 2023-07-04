@@ -35,10 +35,12 @@ class ListingsAdapter
     
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list?.get(position)
+        
         Glide.with(holder.imageView.context)
             .load(item?.image)
             .placeholder(R.drawable.placeholder)
             .into(holder.imageView)
+        
         holder.name.text = item?.product_name
         holder.type.text = item?.product_type
         holder.price.text =
@@ -46,6 +48,8 @@ class ListingsAdapter
                 "₹" + DecimalFormat("#.#").format(item.price + item.tax).toString()
             else
                 "Price unavailable"
+        
+        // Add to cart
         holder.btnAddToCart.setOnClickListener {
             Toast.makeText(it.context, "Coming soon!", Toast.LENGTH_SHORT).show()
         }

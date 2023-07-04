@@ -4,4 +4,11 @@
     <string name="searchbar_hint">Search</string>
     <string name="error_listings">Could not fetch listings.</string>
     <string name="error_add_product">Failed to add product to listings.</string>
+    <string name="failed_to_load">Failed to load data. Please try again later.</string>
+    <string name="product_name">Name</string>
+    <string name="product_type">Type</string>
+    <string name="product_price">Price</string>
+    <string name="product_tax">Tax</string>
+    <string name="error_fields_empty">All fields are mandatory.</string>
+    <string name="error_fields_invalid">Fields Price or Tax are invalid.</string>
 </resources>

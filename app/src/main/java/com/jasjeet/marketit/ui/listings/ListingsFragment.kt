@@ -5,29 +5,25 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.jasjeet.marketit.R
 import com.jasjeet.marketit.databinding.FragmentListingsListBinding
+import com.jasjeet.marketit.util.Resource
 import com.jasjeet.marketit.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 
 class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
     
-    private var columnCount = 1
     private val viewModel by activityViewModel<MainViewModel>()
     
     private var _binding: FragmentListingsListBinding? = null
     private val binding get() = _binding!!
-    
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
-        }
-    }
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,10 +35,7 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
             // Configuring Recycler View
             list.apply {
                 adapter = listingsAdapter
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
+                layoutManager = LinearLayoutManager(context)
             }
             
             // Observing Ui state
@@ -62,10 +55,34 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
     }
     
     private fun observeUiState(listingsAdapter: ListingsAdapter) {
-        viewModel.uiState.observe(viewLifecycleOwner) {
-            listingsAdapter.updateList(it.listings)
-            if (it.error != null){
-                Toast.makeText(context, getString(R.string.error_listings) + " " + it.error.toast(), Toast.LENGTH_LONG).show()
+        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+            binding.progressIndicator.visibility =
+                when (uiState.status) {
+                    Resource.Status.LOADING -> {
+                        // Loading
+                        removeErrorText()
+                        VISIBLE
+                    }
+                    Resource.Status.FAILED -> {
+                        // Error occurred while loading data.
+                        setErrorTextVisible()
+                        GONE
+                    }
+                    Resource.Status.SUCCESS -> {
+                        // Success
+                        removeErrorText()
+                        listingsAdapter.updateList(uiState.listings)
+                        GONE
+                    }
+                }
+            
+            // Showing error.
+            if (uiState.error != null){
+                Snackbar.make(
+                    requireView(),
+                    getString(R.string.error_listings) + " " + uiState.error.toast(),
+                    Snackbar.LENGTH_LONG
+                ).show()
                 viewModel.clearError()
             }
         }
@@ -75,7 +92,14 @@ class ListingsFragment : Fragment(R.layout.fragment_listings_list) {
         findNavController().navigate(R.id.action_listingsFragment_to_addProductFragment)
     }
     
-    companion object {
-        const val ARG_COLUMN_COUNT = "column-count"
+    private fun setErrorTextVisible() {
+        if (!binding.errorText.isVisible)
+            binding.errorText.visibility = VISIBLE
     }
+    
+    private fun removeErrorText() {
+        if (binding.errorText.isVisible)
+            binding.errorText.visibility = GONE
+    }
+    
 }

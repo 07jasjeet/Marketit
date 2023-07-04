@@ -6,15 +6,106 @@
     android:layout_height="match_parent"
     tools:context=".ui.addproduct.AddProductFragment">
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/et_name"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_field_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btn_add"/>
+        app:layout_constraintBottom_toTopOf="@id/text_field_type"
+        android:hint="@string/product_name">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_field_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_field_name"
+        app:layout_constraintBottom_toTopOf="@+id/price_tax_layout"
+        android:hint="@string/product_type">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/product_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <RelativeLayout
+        android:id="@+id/price_tax_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/btn_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_field_type">
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_field_price"
+            android:layout_width="@dimen/price_tax_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:hint="@string/product_price">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:imeOptions="actionNext"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_field_tax"
+            android:layout_width="@dimen/price_tax_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:hint="@string/product_tax">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_tax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:imeOptions="actionDone"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/error_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        app:layout_constraintBottom_toTopOf="@+id/btn_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/price_tax_layout"
+        />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_add"
@@ -24,6 +115,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_name" />
+        app:layout_constraintTop_toBottomOf="@+id/price_tax_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

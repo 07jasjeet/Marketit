@@ -26,6 +26,7 @@ class MainViewModel(
     
     private val errorFlow = MutableStateFlow<ResponseError?>(null)
     private val listingsFlow = MutableStateFlow<ListingData?>(null)
+    private val statusFlow = MutableStateFlow(Resource.Status.LOADING)
     
     val uiState = createUiStateFlow().asLiveData()
     
@@ -37,9 +38,10 @@ class MainViewModel(
     private fun createUiStateFlow(): StateFlow<ListingsUiState> {
         return combine(
             listingsFlow,
-            errorFlow
-        ){ listings: ListingData?, error: ResponseError? ->
-            return@combine ListingsUiState(listings, error)
+            errorFlow,
+            statusFlow
+        ){ listings: ListingData?, error: ResponseError?, status: Resource.Status ->
+            return@combine ListingsUiState(listings, error, status)
         }.stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
@@ -49,14 +51,24 @@ class MainViewModel(
     
     fun fetchListings() =
         viewModelScope.launch(ioDispatcher) {
+            // Emitting loading status
+            statusFlow.emit(Resource.Status.LOADING)
+            
             val result = repository.getData()
             when (result.status) {
-                Resource.Status.FAILED -> errorFlow.emit(result.error)
-                Resource.Status.SUCCESS -> listingsFlow.emit(result.data)
+                Resource.Status.FAILED -> {
+                    statusFlow.emit(Resource.Status.FAILED)
+                    errorFlow.emit(result.error)
+                }
+                Resource.Status.SUCCESS -> {
+                    statusFlow.emit(Resource.Status.SUCCESS)
+                    listingsFlow.emit(result.data)
+                }
                 else -> Unit
             }
         }
     
+    /** To be used to cleanup error when shown.*/
     fun clearError() =
         viewModelScope.launch {
             errorFlow.emit(null)

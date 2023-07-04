@@ -4,12 +4,18 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.jasjeet.marketit.viewmodel.AddProductViewModel
 import com.jasjeet.marketit.R
 import com.jasjeet.marketit.databinding.FragmentAddProductBinding
 import com.jasjeet.marketit.model.ListingDataItem
 import com.jasjeet.marketit.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -27,14 +33,56 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         
         binding.apply {
             btnAdd.setOnClickListener {
-                viewModel.addProduct(price = "10", name = "Bux", type = "Soap", tax = "13")
-                mainViewModel.alertProductAdded(ListingDataItem(price = 10.0, product_name = "Lux", product_type = "Soap", tax = 13.0))
+                val name = productName.text
+                val type = productType.text
+                val price = productPrice.text
+                val tax = productTax.text
+                
+                // Checking if any field is empty or not.
+                if (
+                    name.isNullOrEmpty() ||
+                    type.isNullOrEmpty() ||
+                    price.isNullOrEmpty() ||
+                    tax.isNullOrEmpty()
+                ){
+                    setErrorText(R.string.error_fields_empty)
+                    return@setOnClickListener
+                }
+                
+                // Checking if price and do not have letters in them.
+                val (priceDouble, taxDouble) = try {
+                    Pair(price.toString().toDouble(), tax.toString().toDouble())
+                } catch (e: NumberFormatException){
+                    setErrorText(R.string.error_fields_invalid)
+                    return@setOnClickListener
+                }
+                
+                
+                viewModel.addProduct(
+                    name = name.toString(),
+                    type = type.toString(),
+                    price = price.toString(),
+                    tax = tax.toString()
+                )
+                mainViewModel.alertProductAdded(
+                    ListingDataItem(
+                        product_name = name.toString(),
+                        product_type = type.toString(),
+                        price = priceDouble,
+                        tax = taxDouble
+                    )
+                )
             }
             
             // Observing Ui State
             observeUiState()
             
         }
+    }
+    
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
     
     private fun observeUiState() {
@@ -46,9 +94,17 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         }
     }
     
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun setErrorText(@StringRes id: Int){
+        lifecycleScope.launch(Dispatchers.Default) {
+            withContext(Dispatchers.Main){
+                binding.errorText.text = getString(id)
+            }
+            
+            delay(3000)
+            
+            withContext(Dispatchers.Main) { binding.errorText.text = null }
+            
+        }
     }
     
 }

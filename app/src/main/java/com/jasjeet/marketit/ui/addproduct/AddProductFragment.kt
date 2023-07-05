@@ -81,8 +81,11 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
             btnSelectImage.setOnClickListener {
                 if (tvSelectImage.text == getString(R.string.select_an_image))
                     launchGallery()
-                else
+                else{
                     tvSelectImage.text = getString(R.string.select_an_image)
+                    viewModel.setImageFile(null)
+                }
+                
             }
             
         }
@@ -153,18 +156,26 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                 // Mutating state of Ui and storing the Uri.
                 binding.tvSelectImage.text = getString(R.string.selected)
                 
-                val file : File? = try {
-                    uriToImageFile(result.data?.data!!)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
+                lifecycleScope.launch {
+                    val file : File? = try {
+                        uriToImageFile(result.data?.data!!)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
+                    
+                    withContext(Dispatchers.Default){
+                        // Recording selected file.
+                        viewModel.setImageFile(file)
+                    }
+                    
                 }
                 
-                viewModel.setImageFile(file)
             }
         }
     
-    private fun uriToImageFile(uri: Uri): File? {
+    private suspend fun uriToImageFile(uri: Uri): File? = withContext(Dispatchers.IO) {
+        
         val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
         val cursor = requireContext().contentResolver.query(uri, filePathColumn, null, null, null)
         if (cursor != null) {
@@ -172,11 +183,11 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                 val columnIndex = cursor.getColumnIndex(filePathColumn[0])
                 val filePath = cursor.getString(columnIndex)
                 cursor.close()
-                return File(filePath)
+                return@withContext File(filePath)
             }
             cursor.close()
         }
-        return null
+        return@withContext null
     }
     
     // Permissions
@@ -184,7 +195,7 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         registerForActivityResult( ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach { isGranted ->
                 if (!isGranted.value) {
-                    Snackbar.make(requireView(), "Access Denied", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(requireView(), "Storage access denied.", Snackbar.LENGTH_SHORT).show()
                 }
             }
         }

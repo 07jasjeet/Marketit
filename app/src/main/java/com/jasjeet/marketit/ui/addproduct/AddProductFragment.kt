@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
-import java.io.FileNotFoundException
 
 class AddProductFragment : Fragment(R.layout.fragment_add_product) {
     
@@ -123,17 +122,18 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         }
     }
     
+    // Permission required.
+    private val requiredPermission =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            Manifest.permission.READ_MEDIA_IMAGES
+        else
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    
     private fun launchGallery() {
-        // Permissions required.
-        val permission : String =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                Manifest.permission.READ_MEDIA_IMAGES
-            else
-                Manifest.permission.READ_EXTERNAL_STORAGE
         
         // Different scenarios with permissions
         when{
-            ContextCompat.checkSelfPermission(requireContext(),permission)
+            ContextCompat.checkSelfPermission(requireContext(),requiredPermission)
                     == PackageManager.PERMISSION_GRANTED
             -> {
                 val pickIntent = Intent(Intent.ACTION_PICK)
@@ -143,20 +143,22 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                 openGalleryLauncher.launch(pickIntent)
                 
             }
-            shouldShowRequestPermissionRationale(permission) -> showRationaleDialog()
-            else -> requestPermission.launch( arrayOf(permission) )
+            shouldShowRequestPermissionRationale(requiredPermission) -> showRationaleDialog()
+            else -> requestPermission.launch( arrayOf(requiredPermission) )
         }
     }
     
     
     private val openGalleryLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult( ActivityResultContracts.StartActivityForResult() ){
-                result ->
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
             if( result.resultCode == RESULT_OK && result.data != null){
                 // Mutating state of Ui and storing the Uri.
                 binding.tvSelectImage.text = getString(R.string.selected)
                 
                 lifecycleScope.launch {
+                    
                     val file : File? = try {
                         uriToImageFile(result.data?.data!!)
                     } catch (e: Exception) {
@@ -174,23 +176,26 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
             }
         }
     
-    private suspend fun uriToImageFile(uri: Uri): File? = withContext(Dispatchers.IO) {
+    private suspend fun uriToImageFile(uri: Uri): File? =
+        withContext(Dispatchers.IO) {
         
-        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = requireContext().contentResolver.query(uri, filePathColumn, null, null, null)
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                val columnIndex = cursor.getColumnIndex(filePathColumn[0])
-                val filePath = cursor.getString(columnIndex)
+            var result: File? = null
+            val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
+            val cursor = requireContext().contentResolver.query(uri, filePathColumn, null, null, null)
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    val columnIndex = cursor.getColumnIndex(filePathColumn[0])
+                    val filePath = cursor.getString(columnIndex)
+                    cursor.close()
+                    result = File(filePath)
+                }
                 cursor.close()
-                return@withContext File(filePath)
             }
-            cursor.close()
+            
+            return@withContext result
         }
-        return@withContext null
-    }
     
-    // Permissions
+    // Permission launcher
     private val requestPermission : ActivityResultLauncher<Array<String>> =
         registerForActivityResult( ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach { isGranted ->
@@ -201,21 +206,11 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         }
     
     private fun showRationaleDialog() {
-        val dialog = AlertDialog.Builder(requireContext())
-        with(dialog){
-            setTitle("No Storage Access Granted")
-            setMessage("Cannot access gallery due to permission restrictions from system.")
-            setPositiveButton("Ask Again"){ _, _ ->
-                requestPermission.launch(
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-                )
-            }
-            setNegativeButton("Cancel"){dialog, _->
-                dialog.dismiss()
-            }
-            setNeutralButton("Help"){_,_ ->
-                val helpDialog = AlertDialog.Builder(requireContext())
-                with(helpDialog){
+        
+        fun helpDialog() {
+            AlertDialog
+                .Builder(requireContext())
+                .apply {
                     setTitle("Grant Access Manually")
                     setMessage("To grant access manually, Hold app icon > Click \"App info\" > Permissions")
                     setPositiveButton("OK"){helpDialog , _ ->
@@ -223,8 +218,26 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
                     }
                     show()
                 }
-            }
-            show()
         }
+        
+        // Rationale Dialog
+        AlertDialog
+            .Builder(requireContext())
+            .apply {
+                setTitle("No Storage Access Granted")
+                setMessage("Cannot access gallery due to permission restrictions from system.")
+                setPositiveButton("Ask Again"){ _, _ ->
+                    requestPermission.launch( arrayOf(requiredPermission) )
+                }
+                setNegativeButton("Cancel"){ dialog, _ ->
+                    dialog.dismiss()
+                }
+                setNeutralButton("Help"){ _,_ ->
+                    // Help dialog
+                    helpDialog()
+                }
+                show()
+            }
+        
     }
 }

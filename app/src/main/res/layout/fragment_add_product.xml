@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:src="@drawable/add_product"
-        app:layout_constraintBottom_toTopOf="@id/text_field_name"
+        app:layout_constraintBottom_toTopOf="@id/tv_add_product"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -47,19 +47,19 @@
         android:id="@+id/text_field_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:hint="@string/product_name"
         app:layout_constraintBottom_toTopOf="@id/text_field_type"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/siv_image">
+        app:layout_constraintTop_toBottomOf="@id/tv_add_product">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/product_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionNext"
-            android:singleLine="true" />
+            android:singleLine="true"
+            tools:text="Dettol"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -79,7 +79,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionNext"
-            android:singleLine="true" />
+            android:singleLine="true"
+            tools:text="Soap"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -88,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/error_text"
+        app:layout_constraintBottom_toTopOf="@+id/ll_image_upload"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_field_type">
@@ -106,7 +107,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionNext"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                tools:text="50"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -123,11 +125,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                tools:text="10"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_image_upload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/error_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/price_tax_layout">
+
+        <TextView
+            android:id="@+id/tv_select_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text"
+            android:textSize="@dimen/text_size_medium"
+            android:layout_marginEnd="8dp"
+            android:text="@string/select_an_image"
+            android:maxLength="30"
+            android:ellipsize="marquee" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_select_image"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_large"
+            android:text="@string/plus" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/error_text"
@@ -137,7 +172,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btn_add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/price_tax_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/ll_image_upload" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_add"

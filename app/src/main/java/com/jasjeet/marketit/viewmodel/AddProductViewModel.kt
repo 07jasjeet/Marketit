@@ -25,6 +25,7 @@ class AddProductViewModel(
     
     private val errorFlow = MutableStateFlow<ResponseError?>(null)
     private val statusFlow = MutableStateFlow(Resource.Status.LOADING)
+    private var selectedImage: File? = null
     
     val uiState = createUiStateFlow().asLiveData()
     
@@ -41,12 +42,12 @@ class AddProductViewModel(
         )
     }
     
-    fun addProduct(name: String, type: String, price: String, tax:String) {
+    fun addProduct(name: String, type: String, price: String, tax:String, image: File? = selectedImage) {
         viewModelScope.launch(ioDispatcher) {
             
             withContext(defaultDispatcher){ statusFlow.emit(Resource.Status.LOADING) }
             
-            val result = repository.addProduct(name, type, price, tax, File(""))
+            val result = repository.addProduct(name, type, price, tax, image)
             
             withContext(defaultDispatcher){
                 statusFlow.emit(result.status)
@@ -63,4 +64,7 @@ class AddProductViewModel(
             errorFlow.emit(null)
         }
     
+    fun setImageFile(file: File?){
+        selectedImage = file
+    }
 }

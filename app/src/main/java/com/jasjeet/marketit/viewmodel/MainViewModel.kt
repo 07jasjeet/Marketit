@@ -81,7 +81,9 @@ class MainViewModel(
     fun searchForItem(query: String, onSearchComplete: (ListingData) -> Unit) {
         viewModelScope.launch(defaultDispatcher) {
     
-            if (query.isEmpty()){ onSearchComplete(ListingData()) }
+            if (query.isEmpty()){
+                withContext(mainDispatcher){ onSearchComplete(ListingData()) }
+            }
             
             val searchArea = uiState.value?.listings ?: return@launch
             val result = ListingData()

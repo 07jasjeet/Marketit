@@ -26,9 +26,7 @@ class AppRepositoryImpl(private val apiService: ApiService) : AppRepository {
             }
         }.getOrElse { logAndReturn(it) }
     
-    /** Add a product.
-     *
-     * @param image not uploading images even using postman so is useless for now.*/
+    
     override suspend fun addProduct(
         name: String,
         type: String,

@@ -3,14 +3,12 @@ package com.jasjeet.marketit.service
 import com.jasjeet.marketit.model.AddProductResponse
 import com.jasjeet.marketit.model.ListingData
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
-import java.io.File
 
 interface ApiService {
     
@@ -20,11 +18,11 @@ interface ApiService {
     @Multipart
     @POST("add")
     suspend fun addProduct(
-        @Part("product_name") name: String,
-        @Part("product_type") type: String,
-        @Part("price") price: String,
-        @Part("tax") tax: String,
-        @Part images: MultipartBody.Part?,
+        @Part("product_name") name: RequestBody,
+        @Part("product_type") type: RequestBody,
+        @Part("price") price: RequestBody,
+        @Part("tax") tax: RequestBody,
+        @Part image: MultipartBody.Part?,
     ): Response<AddProductResponse>
     
 }

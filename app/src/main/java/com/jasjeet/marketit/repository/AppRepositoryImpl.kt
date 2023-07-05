@@ -34,10 +34,10 @@ class AppRepositoryImpl(private val apiService: ApiService) : AppRepository {
     ): Resource<AddProductResponse> =
         runCatching {
             val response = apiService.addProduct(
-                name = stringToRequestBody(name),
-                type = stringToRequestBody(type),
-                price = stringToRequestBody(price),
-                tax = stringToRequestBody(tax),
+                name = name.toRequestBody(),
+                type = type.toRequestBody(),
+                price = price.toRequestBody(),
+                tax = tax.toRequestBody(),
                 image = if (image != null){
                     MultipartBody.Part.createFormData(
                         "files[]",
@@ -56,6 +56,6 @@ class AppRepositoryImpl(private val apiService: ApiService) : AppRepository {
         }.getOrElse { logAndReturn(it) }
     
     
-    private fun stringToRequestBody(text: String) : RequestBody
-        = RequestBody.create(MediaType.parse("text/plain"), text)
+    private fun String.toRequestBody() : RequestBody
+        = RequestBody.create(MediaType.parse("text/plain"), this)
 }
